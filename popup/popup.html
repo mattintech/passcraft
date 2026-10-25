@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PassCraft Generator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="../icons/icon-32.png" alt="PassCraft" class="brand-icon" width="24" height="24">
+        <span class="brand-title">PassCraft</span>
+      </div>
+      <div class="header-actions">
+        <button id="settings-toggle-btn" class="icon-button" title="Settings" aria-label="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mode Selector Tabs -->
+    <div class="tabs-segmented" role="tablist">
+      <button class="tab-btn active" id="tab-password" role="tab" aria-selected="true" data-mode="password">
+        Password
+      </button>
+      <button class="tab-btn" id="tab-passphrase" role="tab" aria-selected="false" data-mode="passphrase">
+        Passphrase
+      </button>
+    </div>
+
+    <!-- Output Display Card -->
+    <section class="output-card">
+      <div class="output-text-wrapper">
+        <span id="password-output" class="password-text" tabindex="0" title="Click to copy">Generating...</span>
+      </div>
+      
+      <!-- Strength & Entropy Bar -->
+      <div class="strength-container">
+        <div class="strength-bar-bg">
+          <div id="strength-bar" class="strength-bar-fill"></div>
+        </div>
+        <div class="strength-details">
+          <span id="strength-label" class="strength-label">Strong</span>
+          <span id="entropy-label" class="entropy-label">~64 bits</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="output-actions">
+        <button id="copy-btn" class="btn btn-primary" title="Copy to clipboard">
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="copy-btn-text">Copy</span>
+        </button>
+        <button id="regenerate-btn" class="btn btn-secondary icon-only" title="Generate new (Spacebar)" aria-label="Generate new">
+          <svg id="regenerate-icon" class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Settings Drawer (Collapsible) -->
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-header">
+        <span class="settings-title">Preferences</span>
+        <button id="settings-close-btn" class="icon-button small" aria-label="Close settings">✕</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <label for="setting-history-enabled" class="setting-label">Keep History (Last 3)</label>
+          <span class="setting-hint">Saves up to 3 passwords locally in memory.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setting-history-enabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <label for="setting-auto-copy" class="setting-label">Auto-Copy on Generate</label>
+          <span class="setting-hint">Automatically copy newly generated passwords.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setting-auto-copy">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="security-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>100% offline. Zero trackers. Cryptographically secure.</span>
+      </div>
+    </div>
+
+    <!-- Options Section: Random Password -->
+    <section id="options-password" class="options-container">
+      <div class="control-row">
+        <div class="control-label-group">
+          <label for="length-slider" class="control-label">Length</label>
+          <span id="length-val" class="control-badge">16</span>
+        </div>
+        <input type="range" id="length-slider" min="8" max="64" value="16" class="range-slider">
+      </div>
+
+      <div class="toggles-grid">
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-uppercase" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Uppercase (A-Z)</span>
+        </label>
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-lowercase" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Lowercase (a-z)</span>
+        </label>
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-numbers" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Numbers (0-9)</span>
+        </label>
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-symbols" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Special Characters (!@#$)</span>
+        </label>
+        <label class="toggle-control full-width">
+          <input type="checkbox" id="opt-avoid-ambiguous">
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Avoid Ambiguous (1, l, I, 0, O)</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Options Section: Passphrase -->
+    <section id="options-passphrase" class="options-container hidden">
+      <div class="control-row">
+        <div class="control-label-group">
+          <label for="words-slider" class="control-label">Word Count</label>
+          <span id="words-val" class="control-badge">4</span>
+        </div>
+        <input type="range" id="words-slider" min="3" max="10" value="4" class="range-slider">
+      </div>
+
+      <div class="control-row">
+        <label for="passphrase-separator" class="control-label">Word Separator</label>
+        <select id="passphrase-separator" class="select-input">
+          <option value="-">Hyphen (-)</option>
+          <option value=" ">Space ( )</option>
+          <option value=".">Period (.)</option>
+          <option value="_">Underscore (_)</option>
+          <option value="">None (Concatenated)</option>
+        </select>
+      </div>
+
+      <div class="toggles-grid">
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-capitalize" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Capitalize Words</span>
+        </label>
+        <label class="toggle-control">
+          <input type="checkbox" id="opt-passphrase-number">
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Include Number</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="history-section">
+      <div class="history-header">
+        <div class="history-title-group">
+          <span class="history-title">Recent History</span>
+          <span id="history-badge" class="history-count-badge">0 / 3</span>
+        </div>
+        <button id="clear-history-btn" class="text-button" title="Clear all history">Clear</button>
+      </div>
+
+      <div id="history-list" class="history-list">
+        <!-- Rendered dynamically -->
+        <div class="history-empty">No history recorded yet.</div>
+      </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toast-message">Copied to clipboard!</span>
+    </div>
+  </div>
+
+  <script src="wordlist.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
