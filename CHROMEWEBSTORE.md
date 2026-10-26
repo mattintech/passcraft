@@ -44,9 +44,9 @@ English
 | Asset | Dimensions | Status | Filename |
 |-------|-----------|--------|----------|
 | Store Icon [REQUIRED] | 128×128 PNG | ✅ Ready | `icons/icon-128.png` |
-| Screenshot 1 [REQUIRED] | 1280×800 or 640×400 | ⬜ Not created | `promo/screenshot-password.png` |
-| Screenshot 2 [RECOMMENDED] | 1280×800 or 640×400 | ⬜ Not created | `promo/screenshot-passphrase.png` |
-| Small Promo Tile [RECOMMENDED] | 440×280 | ⬜ Not created | `promo/promo-small.png` |
+| Screenshot 1 [REQUIRED] | 1280×800 PNG | ✅ Ready | `promo/screenshot-1-password.png` |
+| Screenshot 2 [RECOMMENDED] | 1280×800 PNG | ✅ Ready | `promo/screenshot-2-passphrase.png` |
+| Small Promo Tile [RECOMMENDED] | 440×280 PNG | ✅ Ready | `promo/promo-small.png` |
 
 ## Permissions Justification
 

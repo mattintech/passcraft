@@ -4,7 +4,7 @@
   "description": "Secure, account-free password and Diceware passphrase generator extension for Firefox and Chrome.",
   "scripts": {
     "test": "node test.js",
-    "build:zip": "zip -r passcraft-extension.zip . -x '*.git*' '*.DS_Store' 'CHROMEWEBSTORE.md' 'node_modules/*' 'test.js' 'passcraft-extension.zip'"
+    "build:zip": "zip -r passcraft-extension.zip . -x '*.git*' '*.DS_Store' 'CHROMEWEBSTORE.md' 'node_modules/*' 'test.js' 'passcraft-extension.zip' 'promo/*' 'docs/*'"
   },
   "keywords": [
     "password-generator",
