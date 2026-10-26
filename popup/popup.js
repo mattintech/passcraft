@@ -91,8 +91,12 @@ let state = {
   avoidAmbiguous: false,
   wordCount: 4,
   separator: '-',
+  customSeparator: '',
   capitalize: true,
   passphraseNumber: false,
+  passphraseSymbol: false,
+  passphraseSymbolChoice: 'random',
+  customSymbol: '',
   historyEnabled: false, // OFF by default for privacy
   autoCopy: false,
   history: [], // max 3 items
@@ -123,8 +127,13 @@ const el = {
   wordsSlider: document.getElementById('words-slider'),
   wordsVal: document.getElementById('words-val'),
   passphraseSeparator: document.getElementById('passphrase-separator'),
+  customSeparatorInput: document.getElementById('custom-separator-input'),
   optCapitalize: document.getElementById('opt-capitalize'),
   optPassphraseNumber: document.getElementById('opt-passphrase-number'),
+  optPassphraseSymbol: document.getElementById('opt-passphrase-symbol'),
+  passphraseSymbolConfig: document.getElementById('passphrase-symbol-config'),
+  passphraseSymbolChoice: document.getElementById('passphrase-symbol-choice'),
+  customSymbolInput: document.getElementById('custom-symbol-input'),
   settingsToggleBtn: document.getElementById('settings-toggle-btn'),
   settingsCloseBtn: document.getElementById('settings-close-btn'),
   settingsPanel: document.getElementById('settings-panel'),
@@ -212,14 +221,39 @@ function generatePassphrase() {
     words.push(word);
   }
 
+  // Determine separator
+  let sep = state.separator;
+  if (sep === 'custom') {
+    sep = state.customSeparator !== undefined ? state.customSeparator : '-';
+  }
+
+  // Handle number and special character insertions
+  let suffix = '';
+
+  if (state.passphraseSymbol) {
+    const defaultSymbols = '!@#$%^&*-_+=?';
+    let chosenSym = '!';
+    if (state.passphraseSymbolChoice === 'random') {
+      chosenSym = defaultSymbols[secureRandomInt(defaultSymbols.length)];
+    } else if (state.passphraseSymbolChoice === 'custom') {
+      chosenSym = state.customSymbol || '!';
+    } else {
+      chosenSym = state.passphraseSymbolChoice;
+    }
+    suffix += chosenSym;
+  }
+
   if (state.passphraseNumber) {
-    // Append or replace with 1-2 random digits
     const randomDigit = secureRandomInt(90) + 10; // 10 to 99
-    words[words.length - 1] += randomDigit.toString();
+    suffix += randomDigit.toString();
+  }
+
+  if (suffix) {
+    words[words.length - 1] += suffix;
   }
 
   return {
-    password: words.join(state.separator),
+    password: words.join(sep),
     wordCount: count,
     listSize: wordlist.length
   };
@@ -242,7 +276,10 @@ function calculateEntropy() {
     // Passphrase entropy
     const wordBits = state.wordCount * Math.log2(7776); // ~12.92 bits per word
     const numBonus = state.passphraseNumber ? Math.log2(90) : 0;
-    return Math.round(wordBits + numBonus);
+    const symBonus = state.passphraseSymbol 
+      ? (state.passphraseSymbolChoice === 'random' ? Math.log2(13) : Math.log2(2)) 
+      : 0;
+    return Math.round(wordBits + numBonus + symBonus);
   }
 }
 
@@ -443,8 +480,12 @@ async function savePreferences() {
       avoidAmbiguous: state.avoidAmbiguous,
       wordCount: state.wordCount,
       separator: state.separator,
+      customSeparator: state.customSeparator,
       capitalize: state.capitalize,
       passphraseNumber: state.passphraseNumber,
+      passphraseSymbol: state.passphraseSymbol,
+      passphraseSymbolChoice: state.passphraseSymbolChoice,
+      customSymbol: state.customSymbol,
       historyEnabled: state.historyEnabled,
       autoCopy: state.autoCopy
     }
@@ -473,8 +514,30 @@ async function loadPreferences() {
   el.wordsSlider.value = state.wordCount;
   el.wordsVal.textContent = state.wordCount;
   el.passphraseSeparator.value = state.separator;
+  el.customSeparatorInput.value = state.customSeparator || '';
+  if (state.separator === 'custom') {
+    el.customSeparatorInput.classList.remove('hidden');
+  } else {
+    el.customSeparatorInput.classList.add('hidden');
+  }
+
   el.optCapitalize.checked = state.capitalize;
   el.optPassphraseNumber.checked = state.passphraseNumber;
+  el.optPassphraseSymbol.checked = state.passphraseSymbol;
+
+  if (state.passphraseSymbol) {
+    el.passphraseSymbolConfig.classList.remove('hidden');
+  } else {
+    el.passphraseSymbolConfig.classList.add('hidden');
+  }
+
+  el.passphraseSymbolChoice.value = state.passphraseSymbolChoice || 'random';
+  el.customSymbolInput.value = state.customSymbol || '';
+  if (state.passphraseSymbolChoice === 'custom') {
+    el.customSymbolInput.classList.remove('hidden');
+  } else {
+    el.customSymbolInput.classList.add('hidden');
+  }
 
   el.settingHistoryEnabled.checked = state.historyEnabled;
   el.settingAutoCopy.checked = state.autoCopy;
@@ -549,12 +612,53 @@ function setupEventListeners() {
 
   el.passphraseSeparator.addEventListener('change', (e) => {
     state.separator = e.target.value;
+    if (state.separator === 'custom') {
+      el.customSeparatorInput.classList.remove('hidden');
+      el.customSeparatorInput.focus();
+    } else {
+      el.customSeparatorInput.classList.add('hidden');
+    }
+    savePreferences();
+    triggerGenerate(false);
+  });
+
+  el.customSeparatorInput.addEventListener('input', (e) => {
+    state.customSeparator = e.target.value;
     savePreferences();
     triggerGenerate(false);
   });
 
   bindToggle(el.optCapitalize, 'capitalize');
   bindToggle(el.optPassphraseNumber, 'passphraseNumber');
+
+  el.optPassphraseSymbol.addEventListener('change', (e) => {
+    state.passphraseSymbol = e.target.checked;
+    if (state.passphraseSymbol) {
+      el.passphraseSymbolConfig.classList.remove('hidden');
+    } else {
+      el.passphraseSymbolConfig.classList.add('hidden');
+    }
+    savePreferences();
+    triggerGenerate(false);
+  });
+
+  el.passphraseSymbolChoice.addEventListener('change', (e) => {
+    state.passphraseSymbolChoice = e.target.value;
+    if (state.passphraseSymbolChoice === 'custom') {
+      el.customSymbolInput.classList.remove('hidden');
+      el.customSymbolInput.focus();
+    } else {
+      el.customSymbolInput.classList.add('hidden');
+    }
+    savePreferences();
+    triggerGenerate(false);
+  });
+
+  el.customSymbolInput.addEventListener('input', (e) => {
+    state.customSymbol = e.target.value;
+    savePreferences();
+    triggerGenerate(false);
+  });
 
   // Settings
   el.settingsToggleBtn.addEventListener('click', () => {

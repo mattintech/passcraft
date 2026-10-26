@@ -106,7 +106,7 @@ for (const char of noAmb) {
 console.log('✓ Random password generation rules verified.');
 
 console.log('\n--- 4. Testing Passphrase Generation ---');
-function generatePassphrase(count, sep, cap, num) {
+function generatePassphrase(count, sep, cap, num, sym, symChoice, customSym) {
   const words = [];
   for (let i = 0; i < count; i++) {
     const idx = secureRandomInt(EFF_WORDS.length);
@@ -115,25 +115,62 @@ function generatePassphrase(count, sep, cap, num) {
     else word = word.toLowerCase();
     words.push(word);
   }
+  let suffix = '';
+  if (sym) {
+    const defaultSymbols = '!@#$%^&*-_+=?';
+    let chosenSym = '!';
+    if (symChoice === 'random') {
+      chosenSym = defaultSymbols[secureRandomInt(defaultSymbols.length)];
+    } else if (symChoice === 'custom') {
+      chosenSym = customSym || '!';
+    } else {
+      chosenSym = symChoice;
+    }
+    suffix += chosenSym;
+  }
   if (num) {
-    words[words.length - 1] += (secureRandomInt(90) + 10).toString();
+    suffix += (secureRandomInt(90) + 10).toString();
+  }
+  if (suffix) {
+    words[words.length - 1] += suffix;
   }
   return words.join(sep);
 }
 
-const ppCap = generatePassphrase(4, '-', true, false);
+const ppCap = generatePassphrase(4, '-', true, false, false);
 const partsCap = ppCap.split('-');
 assert.strictEqual(partsCap.length, 4, 'Should have 4 parts');
 assert(partsCap.every(p => /^[A-Z][a-z]+$/.test(p)), `All parts should be capitalized: ${ppCap}`);
 
-const ppLower = generatePassphrase(5, ' ', false, false);
+const ppLower = generatePassphrase(5, ' ', false, false, false);
 const partsLower = ppLower.split(' ');
 assert.strictEqual(partsLower.length, 5, 'Should have 5 words');
 assert(partsLower.every(p => /^[a-z]+$/.test(p)), `All parts should be lowercase: ${ppLower}`);
 
-const ppNum = generatePassphrase(3, '.', true, true);
+const ppNum = generatePassphrase(3, '.', true, true, false);
 assert(/\d{2}$/.test(ppNum), 'Should end with 2-digit number');
-console.log('✓ Passphrase generation rules verified.');
+
+// Test custom separator (e.g. "::" or "#" or "+")
+const ppCustomSep = generatePassphrase(3, '::', true, false, false);
+assert.strictEqual(ppCustomSep.split('::').length, 3, 'Should use custom separator "::"');
+
+// Test random special character
+const ppSym = generatePassphrase(4, '-', true, false, true, 'random');
+assert(/[!@#$%^&*\-_+=?]/.test(ppSym), 'Should contain a special character');
+
+// Test specific special character choice (e.g. "$")
+const ppDollar = generatePassphrase(3, '_', true, false, true, '$');
+assert(ppDollar.endsWith('$'), 'Should end with chosen special character "$"');
+
+// Test custom special character (e.g. "~")
+const ppCustomSym = generatePassphrase(3, '_', true, false, true, 'custom', '~');
+assert(ppCustomSym.endsWith('~'), 'Should end with custom special character "~"');
+
+// Test both special character and number
+const ppSymAndNum = generatePassphrase(4, '-', true, true, true, '!');
+assert(/!\d{2}$/.test(ppSymAndNum), 'Should contain both symbol and 2-digit number suffix');
+
+console.log('✓ Passphrase generation rules, custom separators, and special characters verified.');
 
 console.log('\n--- 5. Testing History Capacity & Settings ---');
 let history = [];

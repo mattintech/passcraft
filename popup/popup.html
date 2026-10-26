@@ -153,13 +153,21 @@
 
       <div class="control-row">
         <label for="passphrase-separator" class="control-label">Word Separator</label>
-        <select id="passphrase-separator" class="select-input">
-          <option value="-">Hyphen (-)</option>
-          <option value=" ">Space ( )</option>
-          <option value=".">Period (.)</option>
-          <option value="_">Underscore (_)</option>
-          <option value="">None (Concatenated)</option>
-        </select>
+        <div class="separator-input-group">
+          <select id="passphrase-separator" class="select-input">
+            <option value="-">Hyphen (-)</option>
+            <option value=" ">Space ( )</option>
+            <option value=".">Period (.)</option>
+            <option value="_">Underscore (_)</option>
+            <option value=",">Comma (,)</option>
+            <option value="/">Slash (/)</option>
+            <option value="+">Plus (+)</option>
+            <option value="#">Hash (#)</option>
+            <option value="">None (Concatenated)</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="text" id="custom-separator-input" class="text-input custom-sep-input hidden" placeholder="Custom" maxlength="6" aria-label="Custom separator">
+        </div>
       </div>
 
       <div class="toggles-grid">
@@ -173,6 +181,31 @@
           <span class="toggle-box"></span>
           <span class="toggle-text">Include Number</span>
         </label>
+        <label class="toggle-control full-width">
+          <input type="checkbox" id="opt-passphrase-symbol">
+          <span class="toggle-box"></span>
+          <span class="toggle-text">Include Special Character</span>
+        </label>
+      </div>
+
+      <!-- Special Character Choice Sub-Row -->
+      <div id="passphrase-symbol-config" class="sub-control-row hidden">
+        <label for="passphrase-symbol-choice" class="sub-control-label">Special Character Choice</label>
+        <div class="symbol-choice-group">
+          <select id="passphrase-symbol-choice" class="select-input small">
+            <option value="random">Random (!@#$%^&*)</option>
+            <option value="!">Exclamation (!)</option>
+            <option value="@">At (@)</option>
+            <option value="#">Hash (#)</option>
+            <option value="$">Dollar ($)</option>
+            <option value="%">Percent (%)</option>
+            <option value="&">Ampersand (&)</option>
+            <option value="*">Asterisk (*)</option>
+            <option value="?">Question (?)</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="text" id="custom-symbol-input" class="text-input custom-sym-input hidden" placeholder="e.g. ~" maxlength="3" aria-label="Custom special character">
+        </div>
       </div>
     </section>
 

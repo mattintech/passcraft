@@ -15,7 +15,7 @@ PassCraft is a fast, lightweight, and completely private password and passphrase
 
 KEY FEATURES:
 - Random Password Generator: Customize length (8 to 64 characters) with independent controls for uppercase, lowercase, numbers, special symbols, and an option to exclude ambiguous characters (like 1, l, 0, O).
-- Diceware Passphrase Generator: Create secure, easy-to-remember multi-word passphrases using the official Electronic Frontier Foundation (EFF) wordlist. Customize word count, choose separators (hyphens, spaces, periods, or underscores), and toggle capitalization or appended digits.
+- Diceware Passphrase Generator: Create secure, easy-to-remember multi-word passphrases using the official Electronic Frontier Foundation (EFF) wordlist. Customize word count, choose separators (hyphens, spaces, periods, underscores, or custom characters), and toggle capitalization, special characters, and appended digits.
 - Optional Local History: Off by default for complete zero-knowledge security. When enabled in Preferences, keeps track of your last 3 generated passwords with timestamps. History is stored exclusively on your device in local browser storage, can be cleared with one click, or turned off at any time.
 - Real-Time Strength & Entropy Meter: Instantly view the cryptographic bit-strength and security rating of each generated credential.
 - One-Click Copy & Keyboard Shortcuts: Copy instantly with visual confirmation or press Spacebar to quickly re-roll passwords.

@@ -381,6 +381,66 @@ body {
   border-color: var(--primary);
 }
 
+/* Separator & Symbol input controls */
+.separator-input-group,
+.symbol-choice-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.text-input {
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: none;
+  font-family: var(--font-mono);
+  box-sizing: border-box;
+}
+
+.text-input:focus {
+  border-color: var(--primary);
+}
+
+.custom-sep-input {
+  width: 110px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.custom-sym-input {
+  width: 80px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.select-input.small {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.sub-control-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: rgba(15, 23, 42, 0.4);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+}
+
+.sub-control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
 /* Toggles Grid */
 .toggles-grid {
   display: grid;

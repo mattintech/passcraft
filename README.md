@@ -33,9 +33,10 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 ### 2. Memorable Passphrase Mode
 - **EFF Diceware Wordlist**: Uses the official Electronic Frontier Foundation (EFF) 7,776-word list designed for human memorability and high entropy (~12.92 bits per word).
 - **Word Count Slider**: 3 to 10 words (default: 4).
-- **Word Separators**: Hyphen (`-`), Space (` `), Period (`.`), Underscore (`_`), or None (concatenated).
+- **Word Separators**: Choose from presets (Hyphen `-`, Space ` `, Period `.`, Underscore `_`, Comma `,`, Slash `/`, Plus `+`, Hash `#`, None) or type any **Custom Separator** (e.g. `::`, `~`, `*`).
 - **Capitalization Toggle**: Capitalize each word (`Correct-Horse-Battery-Staple`) or keep all lowercase (`correct-horse-battery-staple`).
-- **Optional Digits**: Append a random 2-digit number for strict site complexity rules.
+- **Include Special Character**: Add a random symbol (`!@#$%^&*`) or pick a specific symbol (`!`, `@`, `#`, `$`, `%`, `&`, `*`, `?`, or custom).
+- **Optional Digits**: Append a random 2-digit number for strict site complexity rules (can be combined with special characters).
 
 ### 3. History & Privacy Controls
 - **Setting: History Logging**: Off by default for maximum security and privacy. Toggle on/off anytime in Preferences (⚙️).
