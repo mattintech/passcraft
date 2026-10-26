@@ -135,6 +135,17 @@ zip -r passcraft-extension.zip . -x "*.git*" "*.DS_Store" "CHROMEWEBSTORE.md"
 
 ---
 
+## Support, Bug Reports & Contributing
+
+We welcome community feedback, bug reports, and contributions!
+
+- **Find the Code:** Hosted on GitHub at [https://github.com/mattintech/passcraft](https://github.com/mattintech/passcraft).
+- **Report a Bug:** Found an issue? Open a [Bug Report](https://github.com/mattintech/passcraft/issues/new?template=bug_report.md).
+- **Request a Feature:** Have an idea? Submit a [Feature Request](https://github.com/mattintech/passcraft/issues/new?template=feature_request.md).
+- **Contributing & PRs:** Read our [CONTRIBUTING.md](CONTRIBUTING.md) guide for coding standards, security requirements, and the step-by-step pull request workflow.
+
+---
+
 ## License
 
 PassCraft is licensed under the [MIT License](file:///Users/matt/code/html/generator/LICENSE).
