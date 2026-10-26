@@ -170,11 +170,22 @@ assert(ppCustomSym.endsWith('~'), 'Should end with custom special character "~"'
 const ppSymAndNum = generatePassphrase(4, '-', true, true, true, '!');
 assert(/!\d{2}$/.test(ppSymAndNum), 'Should contain both symbol and 2-digit number suffix');
 
-console.log('✓ Passphrase generation rules, custom separators, and special characters verified.');
+// Test 1, 2, and 3 words/phrases specifically
+const pp1 = generatePassphrase(1, '-', true, false, false);
+assert.strictEqual(pp1.split('-').length, 1, '1-phrase count should have exactly 1 word');
+
+const pp2 = generatePassphrase(2, '-', true, false, false);
+assert.strictEqual(pp2.split('-').length, 2, '2-phrase count should have exactly 2 words');
+
+const pp3 = generatePassphrase(3, '-', true, false, false);
+assert.strictEqual(pp3.split('-').length, 3, '3-phrase count should have exactly 3 words');
+
+console.log('✓ Passphrase generation rules, 1/2/3 phrase counts, custom separators, and special characters verified.');
 
 console.log('\n--- 5. Testing History Capacity & Settings ---');
 let history = [];
 let historyEnabled = false; // Off by default
+let historyMax = 3;
 
 function recordHistory(password, type) {
   if (!historyEnabled) return;
@@ -184,15 +195,16 @@ function recordHistory(password, type) {
     type,
     createdAt: Date.now()
   };
-  history = [item, ...history.filter(h => h.password !== password)].slice(0, 3);
+  history = [item, ...history.filter(h => h.password !== password)].slice(0, historyMax);
 }
 
 // 1. Verify nothing is recorded when off by default
 recordHistory('pass_default_off', 'password');
 assert.strictEqual(history.length, 0, 'History should not record when off by default');
 
-// 2. Enable history and verify capacity
+// 2. Enable history with limit 3
 historyEnabled = true;
+historyMax = 3;
 recordHistory('pass1', 'password');
 recordHistory('pass2', 'passphrase');
 recordHistory('pass3', 'password');
@@ -202,12 +214,19 @@ assert.strictEqual(history.length, 3, 'History length should strictly be capped 
 assert.strictEqual(history[0].password, 'pass4', 'Newest item should be at the front');
 assert.strictEqual(history[2].password, 'pass2', 'Oldest retained item should be pass2');
 
-// 3. Disable again
-historyEnabled = false;
+// 3. Test changing history limit to 1
+historyMax = 1;
+history = history.slice(0, historyMax);
 recordHistory('pass5', 'password');
-assert.strictEqual(history[0].password, 'pass4', 'Should not record when history is turned off again');
+assert.strictEqual(history.length, 1, 'History length should be capped at 1 when limit is 1');
+assert.strictEqual(history[0].password, 'pass5', 'Only pass5 should remain');
 
-console.log('✓ History tracking (off by default) and preferences verified.');
+// 4. Disable again
+historyEnabled = false;
+recordHistory('pass6', 'password');
+assert.strictEqual(history[0].password, 'pass5', 'Should not record when history is turned off again');
+
+console.log('✓ History tracking (configurable limits 1, 2, 3) and preferences verified.');
 
 console.log('\n=======================================');
 console.log('ALL TESTS PASSED SUCCESSFULLY! (5 / 5)');

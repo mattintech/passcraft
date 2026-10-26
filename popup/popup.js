@@ -98,8 +98,9 @@ let state = {
   passphraseSymbolChoice: 'random',
   customSymbol: '',
   historyEnabled: false, // OFF by default for privacy
+  historyMax: 3,
   autoCopy: false,
-  history: [], // max 3 items
+  history: [],
   currentPassword: ''
 };
 
@@ -118,14 +119,14 @@ const el = {
   strengthLabel: document.getElementById('strength-label'),
   entropyLabel: document.getElementById('entropy-label'),
   lengthSlider: document.getElementById('length-slider'),
-  lengthVal: document.getElementById('length-val'),
+  lengthInput: document.getElementById('length-input'),
   optUppercase: document.getElementById('opt-uppercase'),
   optLowercase: document.getElementById('opt-lowercase'),
   optNumbers: document.getElementById('opt-numbers'),
   optSymbols: document.getElementById('opt-symbols'),
   optAvoidAmbiguous: document.getElementById('opt-avoid-ambiguous'),
   wordsSlider: document.getElementById('words-slider'),
-  wordsVal: document.getElementById('words-val'),
+  wordsInput: document.getElementById('words-input'),
   passphraseSeparator: document.getElementById('passphrase-separator'),
   customSeparatorInput: document.getElementById('custom-separator-input'),
   optCapitalize: document.getElementById('opt-capitalize'),
@@ -138,6 +139,7 @@ const el = {
   settingsCloseBtn: document.getElementById('settings-close-btn'),
   settingsPanel: document.getElementById('settings-panel'),
   settingHistoryEnabled: document.getElementById('setting-history-enabled'),
+  settingHistoryMax: document.getElementById('setting-history-max'),
   settingAutoCopy: document.getElementById('setting-auto-copy'),
   historyList: document.getElementById('history-list'),
   historyBadge: document.getElementById('history-badge'),
@@ -320,8 +322,9 @@ async function recordHistory(password, type) {
     createdAt: Date.now()
   };
 
-  // Keep up to 3 items, newest first
-  state.history = [item, ...state.history.filter(h => h.password !== password)].slice(0, 3);
+  // Keep up to historyMax items, newest first
+  const limit = state.historyMax || 3;
+  state.history = [item, ...state.history.filter(h => h.password !== password)].slice(0, limit);
   await storage.set({ history: state.history });
   renderHistory();
 }
@@ -347,7 +350,7 @@ function renderHistory() {
     return;
   }
 
-  el.historyBadge.textContent = `${state.history.length} / 3`;
+  el.historyBadge.textContent = `${state.history.length} / ${state.historyMax || 3}`;
   el.clearHistoryBtn.disabled = state.history.length === 0;
 
   if (state.history.length === 0) {
@@ -487,6 +490,7 @@ async function savePreferences() {
       passphraseSymbolChoice: state.passphraseSymbolChoice,
       customSymbol: state.customSymbol,
       historyEnabled: state.historyEnabled,
+      historyMax: state.historyMax,
       autoCopy: state.autoCopy
     }
   });
@@ -497,14 +501,15 @@ async function loadPreferences() {
   if (data.passcraft_prefs) {
     state = { ...state, ...data.passcraft_prefs };
   }
+  state.historyMax = state.historyMax || 3;
   if (Array.isArray(data.history)) {
-    state.history = data.history.slice(0, 3);
+    state.history = data.history.slice(0, state.historyMax);
   }
 
   // Sync UI elements with state
   setMode(state.mode, false);
   el.lengthSlider.value = state.length;
-  el.lengthVal.textContent = state.length;
+  el.lengthInput.value = state.length;
   el.optUppercase.checked = state.uppercase;
   el.optLowercase.checked = state.lowercase;
   el.optNumbers.checked = state.numbers;
@@ -512,7 +517,7 @@ async function loadPreferences() {
   el.optAvoidAmbiguous.checked = state.avoidAmbiguous;
 
   el.wordsSlider.value = state.wordCount;
-  el.wordsVal.textContent = state.wordCount;
+  el.wordsInput.value = state.wordCount;
   el.passphraseSeparator.value = state.separator;
   el.customSeparatorInput.value = state.customSeparator || '';
   if (state.separator === 'custom') {
@@ -540,6 +545,7 @@ async function loadPreferences() {
   }
 
   el.settingHistoryEnabled.checked = state.historyEnabled;
+  el.settingHistoryMax.value = state.historyMax.toString();
   el.settingAutoCopy.checked = state.autoCopy;
 
   renderHistory();
@@ -583,7 +589,28 @@ function setupEventListeners() {
   // Password options
   el.lengthSlider.addEventListener('input', (e) => {
     state.length = parseInt(e.target.value, 10);
-    el.lengthVal.textContent = state.length;
+    el.lengthInput.value = state.length;
+    savePreferences();
+    triggerGenerate(false);
+  });
+
+  el.lengthInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (!isNaN(val) && val >= 4 && val <= 128) {
+      state.length = val;
+      el.lengthSlider.value = val;
+      savePreferences();
+      triggerGenerate(false);
+    }
+  });
+
+  el.lengthInput.addEventListener('blur', (e) => {
+    let val = parseInt(e.target.value, 10);
+    if (isNaN(val) || val < 4) val = 4;
+    if (val > 128) val = 128;
+    e.target.value = val;
+    state.length = val;
+    el.lengthSlider.value = val;
     savePreferences();
     triggerGenerate(false);
   });
@@ -602,10 +629,31 @@ function setupEventListeners() {
   bindToggle(el.optSymbols, 'symbols');
   bindToggle(el.optAvoidAmbiguous, 'avoidAmbiguous');
 
-  // Passphrase options
+  // Passphrase options (words/phrases count 1, 2, 3...)
   el.wordsSlider.addEventListener('input', (e) => {
     state.wordCount = parseInt(e.target.value, 10);
-    el.wordsVal.textContent = state.wordCount;
+    el.wordsInput.value = state.wordCount;
+    savePreferences();
+    triggerGenerate(false);
+  });
+
+  el.wordsInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (!isNaN(val) && val >= 1 && val <= 15) {
+      state.wordCount = val;
+      el.wordsSlider.value = val;
+      savePreferences();
+      triggerGenerate(false);
+    }
+  });
+
+  el.wordsInput.addEventListener('blur', (e) => {
+    let val = parseInt(e.target.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 15) val = 15;
+    e.target.value = val;
+    state.wordCount = val;
+    el.wordsSlider.value = val;
     savePreferences();
     triggerGenerate(false);
   });
@@ -674,6 +722,13 @@ function setupEventListeners() {
     savePreferences();
     renderHistory();
     showToast(state.historyEnabled ? 'History logging enabled' : 'History logging disabled');
+  });
+
+  el.settingHistoryMax.addEventListener('change', (e) => {
+    state.historyMax = parseInt(e.target.value, 10) || 3;
+    state.history = state.history.slice(0, state.historyMax);
+    savePreferences();
+    renderHistory();
   });
 
   el.settingAutoCopy.addEventListener('change', (e) => {

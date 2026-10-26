@@ -21,7 +21,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 ## Features
 
 ### 1. Random Password Mode
-- **Length Slider**: 8 to 64 characters (default: 16).
+- **Editable Length**: Slider + directly editable number input (4 to 128 characters, default: 16).
 - **Character Pool Toggles**:
   - Uppercase (`A-Z`)
   - Lowercase (`a-z`)
@@ -32,7 +32,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 
 ### 2. Memorable Passphrase Mode
 - **EFF Diceware Wordlist**: Uses the official Electronic Frontier Foundation (EFF) 7,776-word list designed for human memorability and high entropy (~12.92 bits per word).
-- **Word Count Slider**: 3 to 10 words (default: 4).
+- **Editable Phrase Count**: Slider + directly editable number input allowing `1`, `2`, `3`, or more words/phrases (range: 1 to 15, default: 4).
 - **Word Separators**: Choose from presets (Hyphen `-`, Space ` `, Period `.`, Underscore `_`, Comma `,`, Slash `/`, Plus `+`, Hash `#`, None) or type any **Custom Separator** (e.g. `::`, `~`, `*`).
 - **Capitalization Toggle**: Capitalize each word (`Correct-Horse-Battery-Staple`) or keep all lowercase (`correct-horse-battery-staple`).
 - **Include Special Character**: Add a random symbol (`!@#$%^&*`) or pick a specific symbol (`!`, `@`, `#`, `$`, `%`, `&`, `*`, `?`, or custom).
@@ -40,7 +40,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 
 ### 3. History & Privacy Controls
 - **Setting: History Logging**: Off by default for maximum security and privacy. Toggle on/off anytime in Preferences (⚙️).
-- **Strict Capacity**: Stores only the **last 3 generated credentials** with relative/absolute timestamps (e.g., *"Just now"*, *"2m ago"*).
+- **Configurable Capacity**: Choose history limit (1, 2, 3, or 5) with relative/absolute timestamps (e.g., *"Just now"*, *"2m ago"*).
 - **One-Click Copy**: Instant copy button next to each historical password.
 - **One-Click Clear**: Purge all stored history immediately.
 - **Local Storage Only**: History is stored strictly in your browser's local sandbox (`chrome.storage.local` / `browser.storage.local`), never synced to external servers or Google/Firefox sync accounts.

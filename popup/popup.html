@@ -76,13 +76,25 @@
       </div>
       <div class="setting-item">
         <div class="setting-info">
-          <label for="setting-history-enabled" class="setting-label">Keep History (Last 3)</label>
-          <span class="setting-hint">Saves up to 3 passwords locally in memory.</span>
+          <label for="setting-history-enabled" class="setting-label">Keep History</label>
+          <span class="setting-hint">Saves recent passwords locally in memory.</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="setting-history-enabled">
           <span class="slider"></span>
         </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <label for="setting-history-max" class="setting-label">History Limit</label>
+          <span class="setting-hint">Number of recent items to remember (1, 2, 3).</span>
+        </div>
+        <select id="setting-history-max" class="select-input small" style="width: 70px;">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="5">5</option>
+        </select>
       </div>
       <div class="setting-item">
         <div class="setting-info">
@@ -106,10 +118,10 @@
     <section id="options-password" class="options-container">
       <div class="control-row">
         <div class="control-label-group">
-          <label for="length-slider" class="control-label">Length</label>
-          <span id="length-val" class="control-badge">16</span>
+          <label for="length-input" class="control-label">Length</label>
+          <input type="number" id="length-input" min="4" max="128" value="16" class="control-number-input" aria-label="Password length">
         </div>
-        <input type="range" id="length-slider" min="8" max="64" value="16" class="range-slider">
+        <input type="range" id="length-slider" min="4" max="128" value="16" class="range-slider">
       </div>
 
       <div class="toggles-grid">
@@ -145,10 +157,10 @@
     <section id="options-passphrase" class="options-container hidden">
       <div class="control-row">
         <div class="control-label-group">
-          <label for="words-slider" class="control-label">Word Count</label>
-          <span id="words-val" class="control-badge">4</span>
+          <label for="words-input" class="control-label">Words / Phrases</label>
+          <input type="number" id="words-input" min="1" max="15" value="4" class="control-number-input" aria-label="Number of phrases">
         </div>
-        <input type="range" id="words-slider" min="3" max="10" value="4" class="range-slider">
+        <input type="range" id="words-slider" min="1" max="15" value="4" class="range-slider">
       </div>
 
       <div class="control-row">
