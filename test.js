@@ -137,15 +137,15 @@ function generatePassphrase(count, sep, cap, num, sym, symChoice, customSym) {
   return words.join(sep);
 }
 
-const ppCap = generatePassphrase(4, '-', true, false, false);
-const partsCap = ppCap.split('-');
+const ppCap = generatePassphrase(4, '::', true, false, false);
+const partsCap = ppCap.split('::');
 assert.strictEqual(partsCap.length, 4, 'Should have 4 parts');
-assert(partsCap.every(p => /^[A-Z][a-z]+$/.test(p)), `All parts should be capitalized: ${ppCap}`);
+assert(partsCap.every(p => p[0] === p[0].toUpperCase() && p.slice(1) === p.slice(1).toLowerCase()), `All parts should be capitalized: ${ppCap}`);
 
-const ppLower = generatePassphrase(5, ' ', false, false, false);
-const partsLower = ppLower.split(' ');
+const ppLower = generatePassphrase(5, '::', false, false, false);
+const partsLower = ppLower.split('::');
 assert.strictEqual(partsLower.length, 5, 'Should have 5 words');
-assert(partsLower.every(p => /^[a-z]+$/.test(p)), `All parts should be lowercase: ${ppLower}`);
+assert(partsLower.every(p => p === p.toLowerCase()), `All parts should be lowercase: ${ppLower}`);
 
 const ppNum = generatePassphrase(3, '.', true, true, false);
 assert(/\d{2}$/.test(ppNum), 'Should end with 2-digit number');
@@ -171,14 +171,14 @@ const ppSymAndNum = generatePassphrase(4, '-', true, true, true, '!');
 assert(/!\d{2}$/.test(ppSymAndNum), 'Should contain both symbol and 2-digit number suffix');
 
 // Test 1, 2, and 3 words/phrases specifically
-const pp1 = generatePassphrase(1, '-', true, false, false);
-assert.strictEqual(pp1.split('-').length, 1, '1-phrase count should have exactly 1 word');
+const pp1 = generatePassphrase(1, '::', true, false, false);
+assert.strictEqual(pp1.split('::').length, 1, '1-phrase count should have exactly 1 word');
 
-const pp2 = generatePassphrase(2, '-', true, false, false);
-assert.strictEqual(pp2.split('-').length, 2, '2-phrase count should have exactly 2 words');
+const pp2 = generatePassphrase(2, '::', true, false, false);
+assert.strictEqual(pp2.split('::').length, 2, '2-phrase count should have exactly 2 words');
 
-const pp3 = generatePassphrase(3, '-', true, false, false);
-assert.strictEqual(pp3.split('-').length, 3, '3-phrase count should have exactly 3 words');
+const pp3 = generatePassphrase(3, '::', true, false, false);
+assert.strictEqual(pp3.split('::').length, 3, '3-phrase count should have exactly 3 words');
 
 console.log('✓ Passphrase generation rules, 1/2/3 phrase counts, custom separators, and special characters verified.');
 
