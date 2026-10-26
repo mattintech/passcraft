@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "PassCraft - Offline Password & Passphrase Generator",
+  "name": "PassCraft - Password & Passphrase Generator",
   "version": "1.0.0",
   "description": "Secure, account-free password and Diceware passphrase generator with zero network tracking, entropy meter, and optional history.",
   "icons": {
@@ -25,8 +25,13 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "passcraft@local",
-      "strict_min_version": "109.0"
+      "id": "passcraft@mattintech.com",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      },
+      "strict_min_version": "142.0"
     }
   }
 }
