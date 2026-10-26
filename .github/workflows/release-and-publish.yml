@@ -1,0 +1,68 @@
+name: Publish Extension to Stores
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      auto_publish:
+        description: 'Auto-publish immediately after review (true/false)'
+        required: false
+        default: 'true'
+
+jobs:
+  build-and-publish:
+    name: Build & Submit to Chrome Web Store and Firefox AMO
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Test Suite
+        run: npm test
+
+      - name: Package Extension ZIP
+        run: npm run build:zip
+
+      # Upload to GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: passcraft-extension.zip
+          generate_release_notes: true
+
+      # Chrome Web Store Automated Upload
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        if: env.CHROME_CLIENT_ID != ''
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        with:
+          file-name: 'passcraft-extension.zip'
+          app-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: ${{ github.event.inputs.auto_publish != 'false' }}
+
+      # Firefox Add-ons (AMO) Automated Upload & Signing
+      - name: Upload & Submit to Firefox Add-ons (AMO)
+        uses: wdzeng/firefox-addon-action@v1.1.1
+        if: env.AMO_JWT_ISSUER != ''
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+        with:
+          api-key: ${{ secrets.AMO_JWT_ISSUER }}
+          api-secret: ${{ secrets.AMO_JWT_SECRET }}
+          addon-id: ${{ secrets.AMO_EXTENSION_ID }}
+          xpi-path: 'passcraft-extension.zip'

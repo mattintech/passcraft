@@ -124,6 +124,9 @@ zip -r passcraft-extension.zip . -x "*.git*" "*.DS_Store" "CHROMEWEBSTORE.md"
   - Visit [addons.mozilla.org / Developer Hub](https://addons.mozilla.org/developers/).
   - Submit the ZIP for self-distribution or public listing.
 
+### Automated Publishing via GitHub Actions
+PassCraft includes automated CI/CD workflows to publish directly to the Chrome Web Store and Firefox Add-ons on every tagged release (`v*`). See [docs/AUTOMATING_SUBMISSIONS.md](docs/AUTOMATING_SUBMISSIONS.md) for instructions on setting up your API secrets.
+
 ---
 
 ## Security Architecture

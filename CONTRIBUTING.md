@@ -76,10 +76,19 @@ Have an idea for improving PassCraft? We'd love to hear it:
 
 ---
 
+## 🌿 Branching Strategy
+
+- **`develop`**: The integration branch for active development. All feature branches, bug fixes, and community Pull Requests must target `develop`.
+- **`main`**: The production release branch. Code in `main` is what goes directly to the Chrome Web Store and Firefox Add-ons. Releases are tagged (`v1.0.0`) from `main` to trigger automated store deployments.
+
+---
+
 ## 🚀 Pull Request (PR) Workflow
 
-1. **Create a branch:**
+1. **Create a branch from `develop`:**
    ```bash
+   git checkout develop
+   git pull origin develop
    git checkout -b feat/your-feature-name
    # or
    git checkout -b fix/your-bug-fix
@@ -102,6 +111,7 @@ Have an idea for improving PassCraft? We'd love to hear it:
    ```
 
 5. **Open a Pull Request:**
+   - Target the **`develop`** branch (not `main`).
    - Fill out the PR template on GitHub.
    - Reference any related issues (e.g., `Closes #12`).
    - We will review PRs promptly and provide constructive feedback!

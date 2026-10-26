@@ -1,0 +1,36 @@
+name: CI & Verification
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Unit Tests & Verify Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Automated Test Suite
+        run: npm test
+
+      - name: Test Extension Packaging
+        run: npm run build:zip
+
+      - name: Verify Package Contents
+        run: |
+          unzip -l passcraft-extension.zip
+          test -f manifest.json
+          test -f popup/popup.html
+          test -f popup/popup.js
+          test -f popup/wordlist.js
+          test -f icons/icon-128.png
