@@ -58,7 +58,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 ### Google Chrome, Brave, Edge & Opera
 1. Download or clone this repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/passcraft.git
+   git clone https://github.com/mattintech/passcraft.git
    ```
 2. Open your browser and navigate to:
    - Chrome: `chrome://extensions`
@@ -99,7 +99,7 @@ git commit -m "feat: initial commit of PassCraft password generator extension"
 gh repo create passcraft --public --source=. --push
 
 # Or using standard Git:
-git remote add origin https://github.com/YOUR_USERNAME/passcraft.git
+git remote add origin https://github.com/mattintech/passcraft.git
 git branch -M main
 git push -u origin main
 ```
