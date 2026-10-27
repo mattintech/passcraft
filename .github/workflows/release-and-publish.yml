@@ -65,7 +65,7 @@ jobs:
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
         with:
-          api-key: ${{ secrets.AMO_JWT_ISSUER }}
-          api-secret: ${{ secrets.AMO_JWT_SECRET }}
-          addon-id: ${{ secrets.AMO_EXTENSION_ID }}
+          jwt-issuer: ${{ secrets.AMO_JWT_ISSUER }}
+          jwt-secret: ${{ secrets.AMO_JWT_SECRET }}
+          addon-guid: ${{ secrets.AMO_EXTENSION_ID }}
           xpi-path: 'passcraft-extension.zip'
