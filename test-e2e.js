@@ -132,11 +132,11 @@ async function runE2E() {
     assert.strictEqual(clearClipboardVal, '0', 'Auto-clear clipboard should default to 0 (disabled)');
 
     await page.$eval('#setting-clear-clipboard', el => {
-      el.value = '30';
-      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.value = '45';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
     });
     const updatedClearClipboardVal = await page.$eval('#setting-clear-clipboard', el => el.value);
-    assert.strictEqual(updatedClearClipboardVal, '30', 'Auto-clear clipboard should update to 30s');
+    assert.strictEqual(updatedClearClipboardVal, '45', 'Auto-clear clipboard should update to user-specified 45s');
 
     // Close settings panel
     await page.click('#settings-close-btn');

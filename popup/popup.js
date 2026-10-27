@@ -822,9 +822,26 @@ function setupEventListeners() {
     savePreferences();
   });
 
-  el.settingClearClipboard.addEventListener('change', (e) => {
-    state.clearClipboardSec = parseInt(e.target.value, 10) || 0;
+  const updateClearClipboard = (val) => {
+    let sec = parseInt(val, 10);
+    if (isNaN(sec) || sec < 0) sec = 0;
+    if (sec > 3600) sec = 3600;
+    state.clearClipboardSec = sec;
     savePreferences();
+    return sec;
+  };
+
+  el.settingClearClipboard.addEventListener('input', (e) => {
+    updateClearClipboard(e.target.value);
+  });
+
+  el.settingClearClipboard.addEventListener('change', (e) => {
+    updateClearClipboard(e.target.value);
+  });
+
+  el.settingClearClipboard.addEventListener('blur', (e) => {
+    const sec = updateClearClipboard(e.target.value);
+    e.target.value = sec;
   });
 
   // History Clear

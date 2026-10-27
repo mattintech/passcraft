@@ -126,14 +126,12 @@
       <div class="setting-item">
         <div class="setting-info">
           <label for="setting-clear-clipboard" class="setting-label">Auto-Clear Clipboard</label>
-          <span class="setting-hint">Erase password from clipboard after timeout.</span>
+          <span class="setting-hint">Erase after seconds (0 to disable).</span>
         </div>
-        <select id="setting-clear-clipboard" class="select-input small" style="width: 85px;">
-          <option value="0" selected>Disabled</option>
-          <option value="30">30 sec</option>
-          <option value="60">60 sec</option>
-          <option value="120">2 min</option>
-        </select>
+        <div class="setting-input-wrapper">
+          <input type="number" id="setting-clear-clipboard" class="control-number-input" min="0" max="3600" step="5" value="0" placeholder="0" aria-label="Auto-clear clipboard timeout in seconds">
+          <span class="setting-input-unit">sec</span>
+        </div>
       </div>
       <div class="security-note">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

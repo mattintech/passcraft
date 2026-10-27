@@ -51,7 +51,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 - **Configurable Capacity**: Choose history limit (1, 2, 3, or 5) with relative/absolute timestamps (e.g., *"Just now"*, *"2m ago"*).
 - **One-Click Copy**: Instant copy button next to each historical password.
 - **One-Click Clear**: Purge all stored history immediately.
-- **Auto-Clear Clipboard**: Automatically wipe passwords from your clipboard after 30s, 60s, or 120s.
+- **Auto-Clear Clipboard**: User-configurable timer (e.g. 15s, 30s, 60s, or any custom duration; 0 to disable) to automatically wipe sensitive credentials from your clipboard.
 - **Local Storage Only**: History is stored strictly in your browser's local sandbox (`chrome.storage.local` / `browser.storage.local`), never synced to external servers or Google/Firefox sync accounts.
 
 ### 5. Quality of Life

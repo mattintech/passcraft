@@ -587,6 +587,19 @@ body {
   color: var(--text-muted);
 }
 
+.setting-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.setting-input-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
 /* iOS-style Switch */
 .switch {
   position: relative;
