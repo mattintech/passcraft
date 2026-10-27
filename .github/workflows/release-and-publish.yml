@@ -61,6 +61,7 @@ jobs:
       # Firefox Add-ons (AMO) Automated Upload & Signing
       - name: Upload & Submit to Firefox Add-ons (AMO)
         uses: wdzeng/firefox-addon-action@v1.1.1
+        continue-on-error: true
         if: env.AMO_JWT_ISSUER != ''
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
