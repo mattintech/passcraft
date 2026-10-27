@@ -44,6 +44,7 @@ jobs:
       # Chrome Web Store Automated Upload
       - name: Upload to Chrome Web Store
         uses: mnao305/chrome-extension-upload@v5.0.0
+        continue-on-error: true
         if: env.CHROME_CLIENT_ID != ''
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
