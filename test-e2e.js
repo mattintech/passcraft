@@ -122,27 +122,27 @@ async function runE2E() {
     assert(customSepText.includes('::'), `Passphrase should use custom separator "::", got ${customSepText}`);
     console.log(`✓ Custom separator passphrase: "${customSepText}"`);
 
-    // 6. Settings Panel & Auto-Clear Clipboard Option
-    console.log('\n--- 6. Testing Settings Panel & Clipboard Options ---');
+    // 6. Settings Panel & Preferences
+    console.log('\n--- 6. Testing Settings Panel & Options ---');
     await page.click('#settings-toggle-btn');
     await page.waitForSelector('#settings-panel:not(.hidden)');
 
-    // Verify auto-clear clipboard option exists
-    const clearClipboardVal = await page.$eval('#setting-clear-clipboard', el => el.value);
-    assert.strictEqual(clearClipboardVal, '0', 'Auto-clear clipboard should default to 0 (disabled)');
+    // Verify auto-copy option toggle
+    const autoCopyChecked = await page.$eval('#setting-auto-copy', el => el.checked);
+    assert.strictEqual(autoCopyChecked, false, 'Auto-copy should default to false');
 
-    await page.$eval('#setting-clear-clipboard', el => {
-      el.value = '45';
-      el.dispatchEvent(new Event('input', { bubbles: true }));
+    await page.$eval('#setting-auto-copy', el => {
+      el.checked = true;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    const updatedClearClipboardVal = await page.$eval('#setting-clear-clipboard', el => el.value);
-    assert.strictEqual(updatedClearClipboardVal, '45', 'Auto-clear clipboard should update to user-specified 45s');
+    const updatedAutoCopy = await page.$eval('#setting-auto-copy', el => el.checked);
+    assert.strictEqual(updatedAutoCopy, true, 'Auto-copy should toggle to true');
 
     // Close settings panel
     await page.click('#settings-close-btn');
     const settingsHidden = await page.$eval('#settings-panel', el => el.classList.contains('hidden'));
     assert(settingsHidden, 'Settings panel should close');
-    console.log('✓ Settings panel and auto-clear timer preference verified.');
+    console.log('✓ Settings panel and toggle preferences verified.');
 
     // 7. Clipboard Copy & Toast Feedback
     console.log('\n--- 7. Testing 1-Click Copy & Toast Notification ---');

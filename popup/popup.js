@@ -101,7 +101,6 @@ let state = {
   historyEnabled: false, // OFF by default for privacy
   historyMax: 3,
   autoCopy: false,
-  clearClipboardSec: 0,
   history: [],
   currentPassword: ''
 };
@@ -147,7 +146,6 @@ const el = {
   settingsPanel: document.getElementById('settings-panel'),
   settingHistoryEnabled: document.getElementById('setting-history-enabled'),
   settingHistoryMax: document.getElementById('setting-history-max'),
-  settingClearClipboard: document.getElementById('setting-clear-clipboard'),
   settingAutoCopy: document.getElementById('setting-auto-copy'),
   historyList: document.getElementById('history-list'),
   historyBadge: document.getElementById('history-badge'),
@@ -429,7 +427,6 @@ function renderHistory() {
 
 // Clipboard & Toast
 let toastTimeout = null;
-let clearClipboardTimer = null;
 
 function showToast(msg) {
   el.toastMessage.textContent = msg;
@@ -451,25 +448,6 @@ async function copyToClipboard(text) {
       setTimeout(() => {
         el.copyBtnText.textContent = 'Copy';
       }, 1500);
-    }
-
-    // Auto-clear clipboard timer if enabled
-    if (state.clearClipboardSec > 0) {
-      clearTimeout(clearClipboardTimer);
-      const targetText = text;
-      clearClipboardTimer = setTimeout(async () => {
-        try {
-          const current = await navigator.clipboard.readText();
-          if (current === targetText) {
-            await navigator.clipboard.writeText('');
-            showToast('Clipboard cleared for security');
-          }
-        } catch {
-          // If readText is blocked without focus, write empty directly
-          await navigator.clipboard.writeText('');
-          showToast('Clipboard cleared for security');
-        }
-      }, state.clearClipboardSec * 1000);
     }
   } catch (err) {
     // Fallback for document copy
@@ -561,8 +539,7 @@ async function savePreferences() {
       customSymbol: state.customSymbol,
       historyEnabled: state.historyEnabled,
       historyMax: state.historyMax,
-      autoCopy: state.autoCopy,
-      clearClipboardSec: state.clearClipboardSec
+      autoCopy: state.autoCopy
     }
   });
 }
@@ -619,7 +596,6 @@ async function loadPreferences() {
   el.settingHistoryEnabled.checked = state.historyEnabled;
   el.settingHistoryMax.value = state.historyMax.toString();
   el.settingAutoCopy.checked = state.autoCopy;
-  el.settingClearClipboard.value = (state.clearClipboardSec || 0).toString();
 
   renderHistory();
   triggerGenerate(false);
@@ -820,28 +796,6 @@ function setupEventListeners() {
   el.settingAutoCopy.addEventListener('change', (e) => {
     state.autoCopy = e.target.checked;
     savePreferences();
-  });
-
-  const updateClearClipboard = (val) => {
-    let sec = parseInt(val, 10);
-    if (isNaN(sec) || sec < 0) sec = 0;
-    if (sec > 3600) sec = 3600;
-    state.clearClipboardSec = sec;
-    savePreferences();
-    return sec;
-  };
-
-  el.settingClearClipboard.addEventListener('input', (e) => {
-    updateClearClipboard(e.target.value);
-  });
-
-  el.settingClearClipboard.addEventListener('change', (e) => {
-    updateClearClipboard(e.target.value);
-  });
-
-  el.settingClearClipboard.addEventListener('blur', (e) => {
-    const sec = updateClearClipboard(e.target.value);
-    e.target.value = sec;
   });
 
   // History Clear

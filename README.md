@@ -15,7 +15,6 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 - **100% Offline** — operates with **zero host permissions** (`no network access`). It is physically impossible for the extension to send passwords anywhere.
 - **Both Generator Modes** — traditional high-entropy strings and EFF Diceware passphrases.
 - **Scan to Phone (Offline QR)** — transfer generated credentials to your phone camera without syncing to the cloud.
-- **Auto-Clear Clipboard** — optional timer to automatically wipe sensitive credentials from your system clipboard.
 - **Configurable History** — optional local history (disabled by default for zero-knowledge privacy). When enabled, remembers up to the last 3 generated credentials with timestamps. Can be cleared with one click or toggled off anytime in preferences.
 
 ---
@@ -51,7 +50,6 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 - **Configurable Capacity**: Choose history limit (1, 2, 3, or 5) with relative/absolute timestamps (e.g., *"Just now"*, *"2m ago"*).
 - **One-Click Copy**: Instant copy button next to each historical password.
 - **One-Click Clear**: Purge all stored history immediately.
-- **Auto-Clear Clipboard**: User-configurable timer (e.g. 15s, 30s, 60s, or any custom duration; 0 to disable) to automatically wipe sensitive credentials from your clipboard.
 - **Local Storage Only**: History is stored strictly in your browser's local sandbox (`chrome.storage.local` / `browser.storage.local`), never synced to external servers or Google/Firefox sync accounts.
 
 ### 5. Quality of Life
