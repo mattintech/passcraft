@@ -14,6 +14,8 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 - **No accounts or logins** — instant access on browser startup.
 - **100% Offline** — operates with **zero host permissions** (`no network access`). It is physically impossible for the extension to send passwords anywhere.
 - **Both Generator Modes** — traditional high-entropy strings and EFF Diceware passphrases.
+- **Scan to Phone (Offline QR)** — transfer generated credentials to your phone camera without syncing to the cloud.
+- **Auto-Clear Clipboard** — optional timer to automatically wipe sensitive credentials from your system clipboard.
 - **Configurable History** — optional local history (disabled by default for zero-knowledge privacy). When enabled, remembers up to the last 3 generated credentials with timestamps. Can be cleared with one click or toggled off anytime in preferences.
 
 ---
@@ -28,6 +30,7 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
   - Numbers (`0-9`)
   - Special Characters (`!@#$%^&*()_+-=[]{}|;:,.<>?`)
 - **Avoid Ambiguous Characters**: Excludes easily confused glyphs like `1`, `l`, `I`, `0`, `O`, `o`, `|`, `\`.
+- **Custom Excluded Characters**: Type any specific characters to omit (e.g. `&<>"'` for restrictive bank portals).
 - **Guaranteed Coverage**: Ensures at least one character from every active set is included, then shuffled uniformly.
 
 ### 2. Memorable Passphrase Mode
@@ -38,17 +41,24 @@ Most major password managers (like Bitwarden, 1Password, or Dashlane) require yo
 - **Include Special Character**: Add a random symbol (`!@#$%^&*`) or pick a specific symbol (`!`, `@`, `#`, `$`, `%`, `&`, `*`, `?`, or custom).
 - **Optional Digits**: Append a random 2-digit number for strict site complexity rules (can be combined with special characters).
 
-### 3. History & Privacy Controls
+### 3. Scan to Phone (100% Offline QR Code)
+- Tap the **QR Code** button next to any generated password or passphrase.
+- Displays a high-contrast SVG QR code modal for your mobile camera.
+- **100% client-side SVG rendering**: No external API calls or third-party image servers.
+
+### 4. History & Privacy Controls
 - **Setting: History Logging**: Off by default for maximum security and privacy. Toggle on/off anytime in Preferences (⚙️).
 - **Configurable Capacity**: Choose history limit (1, 2, 3, or 5) with relative/absolute timestamps (e.g., *"Just now"*, *"2m ago"*).
 - **One-Click Copy**: Instant copy button next to each historical password.
 - **One-Click Clear**: Purge all stored history immediately.
+- **Auto-Clear Clipboard**: Automatically wipe passwords from your clipboard after 30s, 60s, or 120s.
 - **Local Storage Only**: History is stored strictly in your browser's local sandbox (`chrome.storage.local` / `browser.storage.local`), never synced to external servers or Google/Firefox sync accounts.
 
-### 4. Quality of Life
+### 5. Quality of Life
 - **Entropy & Strength Meter**: Real-time calculation of cryptographic pool entropy (in bits) with a color-coded strength bar.
 - **One-Click Copy with Feedback**: Click the "Copy" button or click directly on the generated password text.
-- **Keyboard Shortcut**: Press `Spacebar` while the popup is open to instantly re-roll a new password.
+- **Global Keyboard Shortcut**: Open PassCraft anytime using `Alt+Shift+P` (or `Option+Shift+P` on macOS).
+- **In-Popup Keyboard Shortcut**: Press `Spacebar` while the popup is open to instantly re-roll a new password, or `Escape` to dismiss modals.
 - **Auto-Copy Option**: Optional preference to copy newly generated passwords directly to the clipboard.
 - **Persistent Preferences**: Remembers your preferred mode, sliders, and toggles across sessions.
 
@@ -126,6 +136,26 @@ zip -r passcraft-extension.zip . -x "*.git*" "*.DS_Store" "CHROMEWEBSTORE.md"
 
 ### Automated Publishing via GitHub Actions
 PassCraft includes automated CI/CD workflows to publish directly to the Chrome Web Store and Firefox Add-ons on every tagged release (`v*`). See [docs/AUTOMATING_SUBMISSIONS.md](docs/AUTOMATING_SUBMISSIONS.md) for instructions on setting up your API secrets.
+
+---
+
+## Testing & Quality Assurance
+
+PassCraft includes automated unit tests, end-to-end (E2E) browser test suites, and strict store linter checks:
+
+```bash
+# Run unit tests (RNG rejection sampling, EFF wordlist integrity, character filtering)
+npm test
+
+# Run End-to-End (E2E) tests with headless Chromium (Puppeteer)
+npm run test:e2e
+
+# Run all tests
+npm run test:all
+
+# Validate store package against Mozilla's Addons Linter
+npm run build:zip && npx addons-linter passcraft-extension.zip
+```
 
 ---
 

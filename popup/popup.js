@@ -89,6 +89,7 @@ let state = {
   numbers: true,
   symbols: true,
   avoidAmbiguous: false,
+  excludeChars: '',
   wordCount: 4,
   separator: '-',
   customSeparator: '',
@@ -100,6 +101,7 @@ let state = {
   historyEnabled: false, // OFF by default for privacy
   historyMax: 3,
   autoCopy: false,
+  clearClipboardSec: 0,
   history: [],
   currentPassword: ''
 };
@@ -115,6 +117,10 @@ const el = {
   copyBtnText: document.getElementById('copy-btn-text'),
   regenerateBtn: document.getElementById('regenerate-btn'),
   regenerateIcon: document.getElementById('regenerate-icon'),
+  qrBtn: document.getElementById('qr-btn'),
+  qrModal: document.getElementById('qr-modal'),
+  qrCloseBtn: document.getElementById('qr-close-btn'),
+  qrDisplay: document.getElementById('qr-display'),
   strengthBar: document.getElementById('strength-bar'),
   strengthLabel: document.getElementById('strength-label'),
   entropyLabel: document.getElementById('entropy-label'),
@@ -125,6 +131,7 @@ const el = {
   optNumbers: document.getElementById('opt-numbers'),
   optSymbols: document.getElementById('opt-symbols'),
   optAvoidAmbiguous: document.getElementById('opt-avoid-ambiguous'),
+  optExcludeChars: document.getElementById('opt-exclude-chars'),
   wordsSlider: document.getElementById('words-slider'),
   wordsInput: document.getElementById('words-input'),
   passphraseSeparator: document.getElementById('passphrase-separator'),
@@ -140,6 +147,7 @@ const el = {
   settingsPanel: document.getElementById('settings-panel'),
   settingHistoryEnabled: document.getElementById('setting-history-enabled'),
   settingHistoryMax: document.getElementById('setting-history-max'),
+  settingClearClipboard: document.getElementById('setting-clear-clipboard'),
   settingAutoCopy: document.getElementById('setting-auto-copy'),
   historyList: document.getElementById('history-list'),
   historyBadge: document.getElementById('history-badge'),
@@ -166,6 +174,15 @@ function generatePassword() {
     sym = filterAmb(sym);
   }
 
+  if (state.excludeChars && state.excludeChars.length > 0) {
+    const excludeSet = new Set([...state.excludeChars]);
+    const filterEx = (str) => [...str].filter(c => !excludeSet.has(c)).join('');
+    up = filterEx(up);
+    low = filterEx(low);
+    num = filterEx(num);
+    sym = filterEx(sym);
+  }
+
   if (state.uppercase && up.length > 0) {
     pool += up;
     required.push(up[secureRandomInt(up.length)]);
@@ -183,9 +200,15 @@ function generatePassword() {
     required.push(sym[secureRandomInt(sym.length)]);
   }
 
-  // Fallback if user unchecks every toggle
+  // Fallback if user unchecks every toggle or excludes all characters
   if (pool.length === 0) {
-    pool = CHAR_SETS.lowercase;
+    let fallback = CHAR_SETS.lowercase;
+    if (state.excludeChars && state.excludeChars.length > 0) {
+      const excludeSet = new Set([...state.excludeChars]);
+      const filtered = [...fallback].filter(c => !excludeSet.has(c)).join('');
+      fallback = filtered.length > 0 ? filtered : 'x';
+    }
+    pool = fallback;
     required.push(pool[secureRandomInt(pool.length)]);
   }
 
@@ -406,6 +429,8 @@ function renderHistory() {
 
 // Clipboard & Toast
 let toastTimeout = null;
+let clearClipboardTimer = null;
+
 function showToast(msg) {
   el.toastMessage.textContent = msg;
   el.toast.classList.remove('hidden');
@@ -427,6 +452,25 @@ async function copyToClipboard(text) {
         el.copyBtnText.textContent = 'Copy';
       }, 1500);
     }
+
+    // Auto-clear clipboard timer if enabled
+    if (state.clearClipboardSec > 0) {
+      clearTimeout(clearClipboardTimer);
+      const targetText = text;
+      clearClipboardTimer = setTimeout(async () => {
+        try {
+          const current = await navigator.clipboard.readText();
+          if (current === targetText) {
+            await navigator.clipboard.writeText('');
+            showToast('Clipboard cleared for security');
+          }
+        } catch {
+          // If readText is blocked without focus, write empty directly
+          await navigator.clipboard.writeText('');
+          showToast('Clipboard cleared for security');
+        }
+      }, state.clearClipboardSec * 1000);
+    }
   } catch (err) {
     // Fallback for document copy
     const textarea = document.createElement('textarea');
@@ -436,6 +480,31 @@ async function copyToClipboard(text) {
     document.execCommand('copy');
     document.body.removeChild(textarea);
     showToast('Copied to clipboard!');
+  }
+}
+
+// QR Code (Scan to Phone)
+function showQrCode() {
+  if (typeof qrcode === 'undefined') {
+    showToast('QR library loading...');
+    return;
+  }
+  if (!state.currentPassword) {
+    showToast('No password to display');
+    return;
+  }
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(state.currentPassword);
+    qr.make();
+    const svgString = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    el.qrDisplay.replaceChildren(doc.documentElement);
+    el.qrModal.classList.remove('hidden');
+  } catch (err) {
+    console.error('QR generation failed:', err);
+    showToast('Failed to generate QR code');
   }
 }
 
@@ -481,6 +550,7 @@ async function savePreferences() {
       numbers: state.numbers,
       symbols: state.symbols,
       avoidAmbiguous: state.avoidAmbiguous,
+      excludeChars: state.excludeChars,
       wordCount: state.wordCount,
       separator: state.separator,
       customSeparator: state.customSeparator,
@@ -491,7 +561,8 @@ async function savePreferences() {
       customSymbol: state.customSymbol,
       historyEnabled: state.historyEnabled,
       historyMax: state.historyMax,
-      autoCopy: state.autoCopy
+      autoCopy: state.autoCopy,
+      clearClipboardSec: state.clearClipboardSec
     }
   });
 }
@@ -515,6 +586,7 @@ async function loadPreferences() {
   el.optNumbers.checked = state.numbers;
   el.optSymbols.checked = state.symbols;
   el.optAvoidAmbiguous.checked = state.avoidAmbiguous;
+  el.optExcludeChars.value = state.excludeChars || '';
 
   el.wordsSlider.value = state.wordCount;
   el.wordsInput.value = state.wordCount;
@@ -547,6 +619,7 @@ async function loadPreferences() {
   el.settingHistoryEnabled.checked = state.historyEnabled;
   el.settingHistoryMax.value = state.historyMax.toString();
   el.settingAutoCopy.checked = state.autoCopy;
+  el.settingClearClipboard.value = (state.clearClipboardSec || 0).toString();
 
   renderHistory();
   triggerGenerate(false);
@@ -585,6 +658,13 @@ function setupEventListeners() {
   el.copyBtn.addEventListener('click', () => copyToClipboard(state.currentPassword));
   el.passwordOutput.addEventListener('click', () => copyToClipboard(state.currentPassword));
   el.regenerateBtn.addEventListener('click', () => triggerGenerate(false));
+
+  // QR Code (Scan to Phone)
+  el.qrBtn.addEventListener('click', showQrCode);
+  el.qrCloseBtn.addEventListener('click', () => el.qrModal.classList.add('hidden'));
+  el.qrModal.addEventListener('click', (e) => {
+    if (e.target === el.qrModal) el.qrModal.classList.add('hidden');
+  });
 
   // Password options
   el.lengthSlider.addEventListener('input', (e) => {
@@ -628,6 +708,12 @@ function setupEventListeners() {
   bindToggle(el.optNumbers, 'numbers');
   bindToggle(el.optSymbols, 'symbols');
   bindToggle(el.optAvoidAmbiguous, 'avoidAmbiguous');
+
+  el.optExcludeChars.addEventListener('input', (e) => {
+    state.excludeChars = e.target.value;
+    savePreferences();
+    triggerGenerate(false);
+  });
 
   // Passphrase options (words/phrases count 1, 2, 3...)
   el.wordsSlider.addEventListener('input', (e) => {
@@ -736,6 +822,11 @@ function setupEventListeners() {
     savePreferences();
   });
 
+  el.settingClearClipboard.addEventListener('change', (e) => {
+    state.clearClipboardSec = parseInt(e.target.value, 10) || 0;
+    savePreferences();
+  });
+
   // History Clear
   el.clearHistoryBtn.addEventListener('click', async () => {
     state.history = [];
@@ -744,11 +835,17 @@ function setupEventListeners() {
     showToast('History cleared');
   });
 
-  // Spacebar to regenerate
+  // Keyboard Shortcuts: Space to regenerate, Esc to close modals
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
       e.preventDefault();
       triggerGenerate(false);
+    } else if (e.key === 'Escape') {
+      if (!el.qrModal.classList.contains('hidden')) {
+        el.qrModal.classList.add('hidden');
+      } else if (!el.settingsPanel.classList.contains('hidden')) {
+        el.settingsPanel.classList.add('hidden');
+      }
     }
   });
 }

@@ -23,6 +23,15 @@
     "storage",
     "clipboardWrite"
   ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Open PassCraft Generator"
+    }
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "passcraft@mattintech.com",

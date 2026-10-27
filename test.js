@@ -72,10 +72,20 @@ function generatePassword(length, opts) {
     const filterAmb = (str) => [...str].filter(c => !AMBIGUOUS.has(c)).join('');
     up = filterAmb(up); low = filterAmb(low); num = filterAmb(num); sym = filterAmb(sym);
   }
-  if (opts.uppercase) { pool += up; required.push(up[secureRandomInt(up.length)]); }
-  if (opts.lowercase) { pool += low; required.push(low[secureRandomInt(low.length)]); }
-  if (opts.numbers) { pool += num; required.push(num[secureRandomInt(num.length)]); }
-  if (opts.symbols) { pool += sym; required.push(sym[secureRandomInt(sym.length)]); }
+  if (opts.excludeChars && opts.excludeChars.length > 0) {
+    const excludeSet = new Set([...opts.excludeChars]);
+    const filterEx = (str) => [...str].filter(c => !excludeSet.has(c)).join('');
+    up = filterEx(up); low = filterEx(low); num = filterEx(num); sym = filterEx(sym);
+  }
+  if (opts.uppercase && up.length > 0) { pool += up; required.push(up[secureRandomInt(up.length)]); }
+  if (opts.lowercase && low.length > 0) { pool += low; required.push(low[secureRandomInt(low.length)]); }
+  if (opts.numbers && num.length > 0) { pool += num; required.push(num[secureRandomInt(num.length)]); }
+  if (opts.symbols && sym.length > 0) { pool += sym; required.push(sym[secureRandomInt(sym.length)]); }
+
+  if (pool.length === 0) {
+    pool = 'x';
+    required.push(pool);
+  }
 
   const result = [...required];
   for (let i = 0; i < length - required.length; i++) {
@@ -103,7 +113,16 @@ const noAmb = generatePassword(32, { uppercase: true, lowercase: true, numbers: 
 for (const char of noAmb) {
   assert(!AMBIGUOUS.has(char), `Must not contain ambiguous character: ${char}`);
 }
-console.log('✓ Random password generation rules verified.');
+
+// Test custom excluded characters
+const excluded = '@#$"<>\'';
+for (let i = 0; i < 50; i++) {
+  const pwWithEx = generatePassword(32, { uppercase: true, lowercase: true, numbers: true, symbols: true, excludeChars: excluded });
+  for (const c of excluded) {
+    assert(!pwWithEx.includes(c), `Password must not contain excluded character: ${c}`);
+  }
+}
+console.log('✓ Random password generation rules and character exclusions verified.');
 
 console.log('\n--- 4. Testing Passphrase Generation ---');
 function generatePassphrase(count, sep, cap, num, sym, symChoice, customSym) {
@@ -228,6 +247,17 @@ assert.strictEqual(history[0].password, 'pass5', 'Should not record when history
 
 console.log('✓ History tracking (configurable limits 1, 2, 3) and preferences verified.');
 
+console.log('\n--- 6. Testing Offline QR Code Generator ---');
+const qrcode = require('./popup/qrcode.js');
+const qr = qrcode(0, 'M');
+qr.addData('PassCraft-Offline-Test-Secret123!');
+qr.make();
+const svg = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+assert(svg.startsWith('<svg'), 'QR generator must output valid SVG string');
+assert(svg.includes('</svg>'), 'QR generator SVG string must properly close');
+assert(svg.includes('viewBox='), 'QR generator SVG must include scalable viewBox');
+console.log('✓ Offline SVG QR Code generation verified.');
+
 console.log('\n=======================================');
-console.log('ALL TESTS PASSED SUCCESSFULLY! (5 / 5)');
+console.log('ALL TESTS PASSED SUCCESSFULLY! (6 / 6)');
 console.log('=======================================');

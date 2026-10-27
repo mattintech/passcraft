@@ -70,6 +70,18 @@
             <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path>
           </svg>
         </button>
+        <button id="qr-btn" class="btn btn-secondary icon-only" title="Show QR Code (Scan to Phone)" aria-label="Show QR Code">
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            <line x1="17" y1="17" x2="17.01" y2="17"></line>
+            <line x1="7" y1="17" x2="7.01" y2="17"></line>
+            <line x1="17" y1="17" x2="17.01" y2="17"></line>
+          </svg>
+        </button>
       </div>
     </section>
 
@@ -110,6 +122,18 @@
           <input type="checkbox" id="setting-auto-copy">
           <span class="slider"></span>
         </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <label for="setting-clear-clipboard" class="setting-label">Auto-Clear Clipboard</label>
+          <span class="setting-hint">Erase password from clipboard after timeout.</span>
+        </div>
+        <select id="setting-clear-clipboard" class="select-input small" style="width: 85px;">
+          <option value="0" selected>Disabled</option>
+          <option value="30">30 sec</option>
+          <option value="60">60 sec</option>
+          <option value="120">2 min</option>
+        </select>
       </div>
       <div class="security-note">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -172,6 +196,11 @@
           <span class="toggle-box"></span>
           <span class="toggle-text">Avoid Ambiguous (1, l, I, 0, O)</span>
         </label>
+      </div>
+
+      <div class="control-row">
+        <label for="opt-exclude-chars" class="control-label">Exclude Characters</label>
+        <input type="text" id="opt-exclude-chars" class="text-input" placeholder="e.g. &amp; &quot; ' &lt; &gt;" maxlength="30" aria-label="Exclude characters">
       </div>
     </section>
 
@@ -259,6 +288,18 @@
       </div>
     </section>
 
+    <!-- QR Code Modal (Scan to Phone) -->
+    <div id="qr-modal" class="qr-modal hidden">
+      <div class="qr-card">
+        <div class="qr-header">
+          <span class="qr-title">Scan to Phone 📱</span>
+          <button id="qr-close-btn" class="icon-button small" aria-label="Close QR Code">✕</button>
+        </div>
+        <div id="qr-display" class="qr-display"></div>
+        <span class="qr-hint">Scan with your mobile camera to transfer without typing</span>
+      </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="toast hidden" role="status" aria-live="polite">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -268,6 +309,7 @@
     </div>
   </div>
 
+  <script src="qrcode.js"></script>
   <script src="wordlist.js"></script>
   <script src="popup.js"></script>
 </body>

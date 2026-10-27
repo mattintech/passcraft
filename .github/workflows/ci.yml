@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Run Unit Tests & Verify Build
+    name: Unit & E2E Testing with Linter Verification
     runs-on: ubuntu-latest
 
     steps:
@@ -19,9 +19,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Run Automated Test Suite
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Test Suite
         run: npm test
+
+      - name: Run End-to-End (E2E) Browser Tests
+        run: npm run test:e2e
 
       - name: Test Extension Packaging
         run: npm run build:zip
@@ -33,4 +40,8 @@ jobs:
           test -f popup/popup.html
           test -f popup/popup.js
           test -f popup/wordlist.js
+          test -f popup/qrcode.js
           test -f icons/icon-128.png
+
+      - name: Validate with Mozilla Addons Linter
+        run: npx addons-linter passcraft-extension.zip
