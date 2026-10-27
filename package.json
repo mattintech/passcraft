@@ -1,6 +1,6 @@
 {
   "name": "passcraft",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Secure, account-free password and Diceware passphrase generator extension for Firefox and Chrome.",
   "scripts": {
     "test": "node test.js",
